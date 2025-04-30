@@ -1,4 +1,5 @@
 from fastapi import FastAPI, File, Form, HTTPException, status, UploadFile
+from fastapi.responses import Response
 from pydantic import BaseModel, Field, field_serializer
 from typing import Optional
 from datetime import datetime
@@ -25,15 +26,10 @@ class StoredFile(FileMeta):
         return value.isoformat(timespec='seconds')
 
 
-@app.get("/")
-async def read_main():
-    return {"msg": "Hello World"}
-
-
 @app.post("/file/", response_model=StoredFile)
 async def upload_file(
-    uploaded_file: UploadFile = File(...),
-    created_at: Optional[datetime] = Form(None)
+        uploaded_file: UploadFile = File(...),
+        created_at: Optional[datetime] = Form(None)
 ):
     if not created_at:
         raise HTTPException(
@@ -43,7 +39,7 @@ async def upload_file(
 
     content = await uploaded_file.read()
 
-    file_id = uuid4()
+    file_id = UUID('a3c2e4b1-51bf-4c79-9a98-0be6638d5195')
 
     file = StoredFile(
         id=str(file_id),
@@ -59,7 +55,12 @@ async def upload_file(
     return file
 
 
-@app.get("/file/{file_id}/stat", response_model=StoredFile)
+@app.get("/file/")
+async def all_files():
+    return files
+
+
+@app.get("/file/{file_id}/stat/")
 async def stat(file_id: UUID):
     file = files.get(file_id)
 
@@ -72,3 +73,19 @@ async def stat(file_id: UUID):
         "mimetype": file.mimetype,
         "name": file.name
     }
+
+
+@app.get("/file/{file_id}/read/")
+async def stat(file_id: UUID):
+    file = files.get(file_id)
+
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    return Response(
+        content=file.content,
+        media_type=file.mimetype,
+        headers={
+            "Content-Disposition": f'inline; filename="{file.name}"'
+        }
+    )

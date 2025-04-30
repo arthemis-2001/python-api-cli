@@ -8,12 +8,6 @@ from .rest_api import app
 client = TestClient(app)
 
 
-def test_read_main():
-    response = client.get("/")
-    assert response.status_code == 200
-    assert response.json() == {"msg": "Hello World"}
-
-
 def test_upload_file():
     file_content = b"Hello World!"
 
@@ -44,4 +38,21 @@ def test_upload_file():
     assert data["name"] == name
 
 
+def test_stat():
+    response = client.get("/file/67a7c424-6b41-4f25-99e5-2aaccf334567/stat/")
 
+    assert response.status_code == 200
+    assert response.json() == {
+        "create_datetime": "2025-01-01T12:00:00",
+        "size": 17,
+        "mimetype": "text/plain",
+        "name": "pinkie_pie.txt"
+    }
+
+
+def test_read():
+    response = client.get("/file/67a7c424-6b41-4f25-99e5-2aaccf334567/read/")
+
+    assert response.status_code == 200
+    assert response.headers.get("Content-Type") == "text/plain; charset=utf-8"
+    assert response.content == b"Hello Pinkie Pie!"
