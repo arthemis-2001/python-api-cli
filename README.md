@@ -26,7 +26,7 @@ The API includes the following routes:
 ## file-client
 This is the output of `file-client -h`:
 
-``python
+```
 usage: file-client [-h] [-b {grpc,rest}] [-g GRPC_SERVER] [-u BASE_URL] [-o OUTPUT] {stat,read} ...
 
 A simple CLI application which retrieves and prints data from a REST API.
@@ -46,7 +46,7 @@ subcommands:
   {stat,read}           File operations
     stat                Prints the file metadata in a human-readable manner.
     read                Outputs the file content.
-``
+```
 
 Warning: Only REST is implemented.
 
