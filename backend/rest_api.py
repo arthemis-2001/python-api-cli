@@ -1,3 +1,12 @@
+"""
+A simple REST API using FastAPI framework with an in-memory database (a Python dict).
+
+Routes included:
+- POST: `/file/` -- upload a file to the dict.
+- GET: `/file/{file_id}/stat/` -- get the metadata about a file (file_id is its UUID)
+- GET: `/file/{file_id}/read/` -- get the content of a file (file_id is its UUID)
+"""
+
 from fastapi import FastAPI, File, Form, HTTPException, status, UploadFile
 from fastapi.responses import Response
 from pydantic import BaseModel, Field, field_serializer

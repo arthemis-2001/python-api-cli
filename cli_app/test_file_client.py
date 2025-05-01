@@ -18,6 +18,17 @@ def test_stat(mock_stat_response, capsys):
     assert "File created at: 2025-01-01T12:00:00" in captured.out
 
 
+def test_stat_another_url(mock_stat_response_another_url, capsys):
+    line = "file-client -b rest -u https://api.example.com/ stat 89c533b3-2106-4f26-adff-1314d3148896"
+    sys.argv = line.split()
+    file_client.main()
+    captured = capsys.readouterr()
+    assert "File name: main.py" in captured.out
+    assert "Size: 30 bytes" in captured.out
+    assert "MIME type: text/x-python" in captured.out
+    assert "File created at: 2024-12-01T12:00:00" in captured.out
+
+
 def test_stat_output_file(mock_stat_response, capsys):
     with tempfile.TemporaryDirectory() as tmpdir:
         output_path = Path(tmpdir) / "out.txt"
@@ -49,6 +60,14 @@ def test_read(mock_read_response, capsys):
     file_client.main()
     captured = capsys.readouterr()
     assert "Hello Pinkie Pie!" in captured.out
+
+
+def test_read_another_url(mock_read_response_another_url, capsys):
+    line = "file-client -b rest -u https://api.example.com/ read 89c533b3-2106-4f26-adff-1314d3148896"
+    sys.argv = line.split()
+    file_client.main()
+    captured = capsys.readouterr()
+    assert "print(This is an example API!)" in captured.out
 
 
 def test_read_output_file(mock_read_response, capsys):
