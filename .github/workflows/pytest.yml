@@ -7,7 +7,7 @@ on:
 permissions:
   contents: read
 jobs:
-  Pytes-API-Testing:
+  Pytest-API-Testing:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -23,14 +23,3 @@ jobs:
     - name: Test with pytest
       run: |
         pytest
-    - name: Archive Pytest test report
-      uses: actions/upload-artifact@v4
-      with:
-        name: SuperTest-test-report
-        path: report
-
-    - name: Upload Pytest report to GitHub
-      uses: actions/upload-artifact@v4
-      with:
-        name: Pytest-test-report
-        path: report

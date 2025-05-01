@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 import io
 from datetime import datetime
 
-from .rest_api import app
+from .rest_api import files, app
 
 client = TestClient(app)
 
