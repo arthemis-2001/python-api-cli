@@ -19,9 +19,9 @@ To install the `file-client` command, run `pip install -e ./cli_app`.
 To run the REST API app, run `uvicorn backend.rest_api:app --reload`.
 
 The API includes the following routes:
-- POST: `/file/` -- upload a file to the dict.
-- GET: `/file/{file_id}/stat/` -- get the metadata about a file (file_id is its UUID)
-- GET: `/file/{file_id}/read/` -- get the content of a file (file_id is its UUID)
+- POST: `/file/` -- upload a file to the in-memory database (which is a dict).
+- GET: `/file/{file_id}/stat/` -- get the metadata about a file from the dict (file_id is its UUID); if it is not present, return the status 404
+- GET: `/file/{file_id}/read/` -- get the content of a file from the dict (file_id is its UUID); if it is not present, return the status 404
 
 ## file-client
 This is the output of `file-client -h`:
