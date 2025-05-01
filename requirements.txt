@@ -27,6 +27,7 @@ python-dotenv==1.1.0
 python-multipart==0.0.20
 PyYAML==6.0.2
 requests==2.32.3
+requests-mock==1.12.1
 rich==14.0.0
 rich-toolkit==0.14.4
 setuptools==80.1.0
