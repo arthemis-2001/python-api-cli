@@ -1,0 +1,7 @@
+version: "3.8"
+
+services:
+  cli:
+    build: .
+    container_name: file_client_cli
+    entrypoint: ["pytest", "--verbose"]
