@@ -22,6 +22,7 @@ The API includes the following routes:
 - POST: `/file/` -- upload a file to the in-memory database (which is a dict).
 - GET: `/file/{file_id}/stat/` -- get the metadata about a file from the dict (file_id is its UUID); if it is not present, return the status 404
 - GET: `/file/{file_id}/read/` -- get the content of a file from the dict (file_id is its UUID); if it is not present, return the status 404
+- DELETE: `/file/{file_id}/` -- delete a file from the dict (file_id is its UUID); if it is not present, return the status 404
 
 ## file-client
 This is the output of `file-client -h`:

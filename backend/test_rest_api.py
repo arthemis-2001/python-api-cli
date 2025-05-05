@@ -56,3 +56,15 @@ def test_read():
     assert response.status_code == 200
     assert response.headers.get("Content-Type") == "text/plain; charset=utf-8"
     assert response.content == b"Hello Pinkie Pie!"
+
+
+def test_delete_file():
+    response = client.delete("/file/67a7c424-6b41-4f25-99e5-2aaccf334567/")
+
+    assert response.status_code == 200
+    data = response.json()
+
+    assert data["create_datetime"] == "2025-01-01T12:00:00"
+    assert data["size"] == 17
+    assert data["mimetype"] == "text/plain"
+    assert data["name"] == "pinkie_pie.txt"

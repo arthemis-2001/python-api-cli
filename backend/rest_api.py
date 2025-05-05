@@ -2,9 +2,10 @@
 A simple REST API using FastAPI framework with an in-memory database (a Python dict).
 
 Routes included:
-- POST: `/file/` -- upload a file to the dict.
+- POST: `/file/` -- upload a file to the dict
 - GET: `/file/{file_id}/stat/` -- get the metadata about a file (file_id is its UUID)
 - GET: `/file/{file_id}/read/` -- get the content of a file (file_id is its UUID)
+- DELETE: `/file/{file_id}/` -- delete a file from the dict (file_id is its UUID)
 """
 
 from fastapi import FastAPI, File, Form, HTTPException, status, UploadFile
@@ -98,3 +99,13 @@ async def read(file_id: UUID):
             "Content-Disposition": f'inline; filename="{file.name}"'
         }
     )
+
+
+@app.delete("/file/{file_id}/", response_model=StoredFile)
+async def delete_file(file_id: UUID):
+    file = files.pop(file_id, None)
+
+    if not file:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    return file
