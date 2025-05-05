@@ -85,7 +85,7 @@ async def stat(file_id: UUID):
 
 
 @app.get("/file/{file_id}/read/")
-async def stat(file_id: UUID):
+async def read(file_id: UUID):
     file = files.get(file_id)
 
     if not file:
