@@ -20,68 +20,91 @@ Options:
 import sys
 import argparse
 import requests
+from typing import *
 from urllib.parse import urljoin
 
 
-def stat(args):
-    if args.backend == "grpc":
+def _fetch_data(backend: str, uuid: str, url: str) -> Optional[requests.Response]:
+    if backend == "grpc":
         raise NotImplementedError("grpc backend not implemented")
     else:
-        url = urljoin(args.base_url, f"file/{args.uuid}/stat/")
-
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=5)
 
             if response.status_code == 200:
-                data = response.json()
+                return response
 
-                if args.output != "-":
-                    with open(args.output, "w") as dest_file:
-                        print(f"File name: {data['name']}", file=dest_file)
-                        print(f"Size: {data["size"]} bytes", file=dest_file)
-                        print(f"MIME type: {data['mimetype']}", file=dest_file)
-                        print(f"File created at: {data['create_datetime']}", file=dest_file)
-                else:
-                    print(f"File name: {data['name']}")
-                    print(f"Size: {data["size"]} bytes")
-                    print(f"MIME type: {data['mimetype']}")
-                    print(f"File created at: {data['create_datetime']}")
-
+            elif response.status_code == 400:
+                print(f"Bad request.", file=sys.stderr)
+            elif response.status_code == 401:
+                print(f"Authorization required.", file=sys.stderr)
+            elif response.status_code == 403:
+                print(f"Access forbidden.", file=sys.stderr)
             elif response.status_code == 404:
-                print(f"File under {args.uuid} not found.", file=sys.stderr)
-                sys.exit(1)
+                print(f"File under {uuid} not found.", file=sys.stderr)
+            elif response.status_code >= 500:
+                print(f"Server error.", file=sys.stderr)
         except requests.exceptions.ConnectionError:
             print(f"REST backend not reachable.", file=sys.stderr)
+        except requests.exceptions.Timeout:
+            print(f"Request timed out.", file=sys.stderr)
+        except requests.exceptions.MissingSchema:
+            print(f"Error: Invalid URL.", file=sys.stderr)
+
+    return None
+
+
+def stat(args: Any) -> None:
+    response = _fetch_data(
+        args.backend,
+        args.uuid,
+        urljoin(args.base_url, f"file/{args.uuid}/stat/")
+    )
+
+    if response is not None:
+        try:
+            data = response.json()
+
+            if args.output != "-":
+                with open(args.output, "w") as dest_file:
+                    print(f"File name: {data['name']}", file=dest_file)
+                    print(f"Size: {data["size"]} bytes", file=dest_file)
+                    print(f"MIME type: {data['mimetype']}", file=dest_file)
+                    print(f"File created at: {data['create_datetime']}", file=dest_file)
+            else:
+                print(f"File name: {data['name']}")
+                print(f"Size: {data["size"]} bytes")
+                print(f"MIME type: {data['mimetype']}")
+                print(f"File created at: {data['create_datetime']}")
+        except ValueError:
+            print(f"Error parsing JSON.", file=sys.stderr)
             sys.exit(1)
 
-
-def read(args):
-    if args.backend == "grpc":
-        raise NotImplementedError("grpc backend not implemented")
     else:
-        url = urljoin(args.base_url, f"file/{args.uuid}/read/")
-
-        try:
-            response = requests.get(url)
-
-            if response.status_code == 200:
-                data = response.content
-
-                if args.output != "-":
-                    with open(args.output, "wb") as dest_file:
-                        dest_file.write(data)
-                else:
-                    sys.stdout.buffer.write(data)
-
-            elif response.status_code == 404:
-                print(f"File under {args.uuid} not found.", file=sys.stderr)
-                sys.exit(1)
-        except requests.exceptions.ConnectionError:
-            print(f"REST backend not reachable.", file=sys.stderr)
-            sys.exit(1)
+        sys.exit(1)
 
 
-def main():
+def read(args: Any) -> None:
+    response = _fetch_data(
+        args.backend,
+        args.uuid,
+        urljoin(args.base_url, f"file/{args.uuid}/read/")
+    )
+
+    if response is not None:
+        data = response.content
+
+        if args.output != "-":
+            with open(args.output, "wb") as dest_file:
+                dest_file.write(data)
+        else:
+            sys.stdout.buffer.write(data)
+
+    else:
+        sys.exit(1)
+
+
+def main() -> None:
     parser = argparse.ArgumentParser(
         prog="file-client",
         description="A simple CLI application which retrieves and prints data from a REST API."
